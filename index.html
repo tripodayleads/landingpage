@@ -264,7 +264,7 @@ function gtag_report_conversion(url) {
   // Paste your Web App /exec URL here:
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxD6Ky95w48SzakNPr_A4bVA05nv09j89CveyodMkNKJYdUfeUep9l6YQ8cba8PYDWGg/exec';
 
-  document.addEventListener('DOMContentLoaded', function () {
+
     document.querySelectorAll('form.lead').forEach(function (form) {
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -305,7 +305,6 @@ function gtag_report_conversion(url) {
         }
       });
     });
-  });
 
 
   </script>
