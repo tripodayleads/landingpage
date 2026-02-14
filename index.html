@@ -185,7 +185,7 @@ function gtag_report_conversion(url) {
     <div class='container center'>
       <div class='section-title'>Plan Your Dream Trip</div>
       <p class='section-desc'>Fill in your details and get the best deals from our experts</p>
-      <form class='lead' action='#' method='post'>
+      <form class='lead' novalidate>
         <div class='form-row'><input type='text' name='name' placeholder='Full Name *' required></div>
         <div class='form-row'><input type='tel' name='phone' placeholder='Phone Number *' required></div>
         <div class='form-row'><input type='email' name='email' placeholder='Email *' required></div>
@@ -229,7 +229,7 @@ function gtag_report_conversion(url) {
       <button class='modal-close' aria-label='Close'>×</button>
       <h3 id='modalTitle' class='modal-title'>Plan Your Dream Trip</h3>
       <p id='modalDesc' class='modal-desc'>Fill in your details and get the best deals from our experts</p>
-      <form class='lead' id='popup-form' action='#' method='post'>
+      <form class='lead' id='popup-form' novalidate>
         <div class='form-row'><input type='text' name='name' placeholder='Full Name *' required></div>
         <div class='form-row'><input type='tel' name='phone' placeholder='Phone Number *' required></div>
         <div class='form-row'><input type='email' name='email' placeholder='Email *' required></div>
@@ -246,6 +246,8 @@ function gtag_report_conversion(url) {
    SAFE PAGE INITIALIZATION
 ================================ */
 document.addEventListener("DOMContentLoaded", function () {
+
+  console.log("✅ Lead handler initialized");
 
   /* ---------- Modal Logic ---------- */
   const modal = document.getElementById("lead-modal");
@@ -308,7 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ================================= */
 
   const SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbzpUKkmK6rowgUgRYaBhwHm1Yrfpijege0sz8JJsEqjiFXaaLWRfjRTiJLEgpK3AarhlQ/exec";
+    "https://script.google.com/macros/s/AKfycbxxD6Ky95w48SzakNPr_A4bVA05nv09j89CveyodMkNKJYdUfeUep9l6YQ8cba8PYDWGg/exec";
 
   document.querySelectorAll("form.lead").forEach(form => {
 
