@@ -242,72 +242,138 @@ function gtag_report_conversion(url) {
   </div>
 
   <script>
-    function setVh(){ document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
-    setVh(); window.addEventListener('resize', setVh);
-    const modal = document.getElementById('lead-modal');
-    const dialog = modal.querySelector('.modal-dialog');
-    const closeBtn = modal.querySelector('.modal-close');
-    const backdrop = modal.querySelector('.modal-backdrop');
-    const openers = document.querySelectorAll('.open-modal');
-    let scrollY = 0, lastFocus = null;
-    function openModal(){ lastFocus = document.activeElement; scrollY = window.scrollY||window.pageYOffset; document.body.style.position='fixed'; document.body.style.top='-'+scrollY+'px'; document.body.style.width='100%'; document.body.style.overscrollBehavior='contain'; modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); setTimeout(function(){ dialog.focus(); }, 10); }
-    function closeModal(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); document.body.style.position=''; document.body.style.top=''; document.body.style.width=''; document.body.style.overscrollBehavior=''; window.scrollTo(0, scrollY); if(lastFocus){ lastFocus.focus(); } }
-    window.addEventListener('DOMContentLoaded', function(){ openModal(); });
-    openers.forEach(function(el){ el.addEventListener('click', function(e){ e.preventDefault(); openModal(); }); });
-    closeBtn.addEventListener('click', closeModal); backdrop.addEventListener('click', closeModal);
-    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
-    document.addEventListener('focusin', function(e){ if(modal.classList.contains('show') && !modal.contains(e.target)) dialog.focus(); });
-  </script>
+/* ===============================
+   SAFE PAGE INITIALIZATION
+================================ */
+document.addEventListener("DOMContentLoaded", function () {
 
+  /* ---------- Modal Logic ---------- */
+  const modal = document.getElementById("lead-modal");
 
-<script>
-  // Paste your Web App /exec URL here:
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxD6Ky95w48SzakNPr_A4bVA05nv09j89CveyodMkNKJYdUfeUep9l6YQ8cba8PYDWGg/exec';
+  if (modal) {
+    const dialog = modal.querySelector(".modal-dialog");
+    const closeBtn = modal.querySelector(".modal-close");
+    const backdrop = modal.querySelector(".modal-backdrop");
+    const openers = document.querySelectorAll(".open-modal");
 
+    let scrollY = 0;
+    let lastFocus = null;
 
-    document.querySelectorAll('form.lead').forEach(function (form) {
-      form.addEventListener('submit', async function (e) {
+    function openModal() {
+      lastFocus = document.activeElement;
+      scrollY = window.scrollY || window.pageYOffset;
+
+      document.body.style.position = "fixed";
+      document.body.style.top = "-" + scrollY + "px";
+      document.body.style.width = "100%";
+
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+
+      setTimeout(() => dialog?.focus(), 10);
+    }
+
+    function closeModal() {
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+
+      window.scrollTo(0, scrollY);
+      lastFocus?.focus();
+    }
+
+    // Auto open once
+    openModal();
+
+    openers.forEach(btn => {
+      btn.addEventListener("click", e => {
         e.preventDefault();
-
-        const data = {
-          name:        form.querySelector('[name="name"]').value.trim(),
-          phone:       form.querySelector('[name="phone"]').value.trim(),
-          email:       form.querySelector('[name="email"]').value.trim(),
-          destination: form.querySelector('[name="destination"]').value,
-          date:        form.querySelector('[name="date"]')?.value || '',
-          count:       form.querySelector('[name="count"]')?.value || ''
-        };
-
-        if (!data.name || !data.phone || !data.email || !data.destination) {
-          alert('Please complete all required fields.');
-          return;
-        }
-
-        const body = new URLSearchParams(data).toString();
-
-        try {
-          const res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-            body
-          });
-
-          const json = await res.json().catch(() => null);
-          if (json && json.ok) {
-            alert('Thanks! Your enquiry was submitted. We will reach out shortly.');
-            form.reset();
-          } else {
-            alert('Sorry, something went wrong while submitting your enquiry.');
-          }
-        } catch (err) {
-          console.error('Fetch error:', err);
-          alert('Network error. Please try again.');
-        }
+        openModal();
       });
     });
 
+    closeBtn?.addEventListener("click", closeModal);
+    backdrop?.addEventListener("click", closeModal);
 
-  </script>
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeModal();
+    });
+  }
+
+  /* ===============================
+     GOOGLE SHEETS FORM SUBMIT
+  ================================= */
+
+  const SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbxxD6Ky95w48SzakNPr_A4bVA05nv09j89CveyodMkNKJYdUfeUep9l6YQ8cba8PYDWGg/exec";
+
+  document.querySelectorAll("form.lead").forEach(form => {
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      const data = {
+        name: form.name.value.trim(),
+        phone: form.phone.value.trim(),
+        email: form.email.value.trim(),
+        destination: form.destination.value,
+        date: form.date?.value || "",
+        count: form.count?.value || ""
+      };
+
+      if (!data.name || !data.phone || !data.email || !data.destination) {
+        alert("Please complete all required fields.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Get Best Deal";
+        return;
+      }
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/x-www-form-urlencoded;charset=UTF-8"
+          },
+          body: new URLSearchParams(data).toString()
+        });
+
+        const json = await res.json().catch(() => null);
+
+        if (json && json.ok) {
+
+          // Google Ads conversion trigger
+          if (typeof gtag_report_conversion === "function") {
+            gtag_report_conversion();
+          }
+
+          alert("✅ Thanks! Your enquiry was submitted.");
+          form.reset();
+
+        } else {
+          alert("❌ Submission failed. Please try again.");
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Network error. Please try again.");
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Get Best Deal";
+    });
+
+  });
+
+});
+</script>
 
 </body>
 </html>
